@@ -368,6 +368,8 @@ module_param_named(cpu_intensive_thresh_us, wq_cpu_intensive_thresh_us, ulong, 0
 static unsigned int wq_cpu_intensive_warning_thresh = 4;
 module_param_named(cpu_intensive_warning_thresh, wq_cpu_intensive_warning_thresh, uint, 0644);
 #endif
+static bool wq_disable_numa;
+module_param_named(disable_numa, wq_disable_numa, bool, 0644);
 
 /* see the comment above the definition of WQ_POWER_EFFICIENT */
 static bool wq_power_efficient = IS_ENABLED(CONFIG_WQ_POWER_EFFICIENT_DEFAULT);
