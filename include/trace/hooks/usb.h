@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM usb
-
+#undef TRACE_INCLUDE_PATH
 #define TRACE_INCLUDE_PATH trace/hooks
 
 #if !defined(_TRACE_HOOK_USB_H) || defined(TRACE_HEADER_MULTI_READ)
@@ -38,4 +38,3 @@ DECLARE_HOOK(android_vh_xhci_full_reset_on_remove,
 #endif /*  _TRACE_HOOK_USB_H */
 /*  This part must be outside protection */
 #include <trace/define_trace.h>
-
