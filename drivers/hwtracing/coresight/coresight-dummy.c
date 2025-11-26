@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (c) 2023-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #include <linux/coresight.h>
@@ -69,7 +69,7 @@ static int qmi_assign_dummy_source_atid(struct dummy_drvdata *drvdata)
 	if (ret)
 		return -EINVAL;
 
-	atid_data = kzalloc(sizeof(*atid_data), GFP_KERNEL);
+	atid_data = devm_kzalloc(drvdata->dev, sizeof(*atid_data), GFP_KERNEL);
 	if (!atid_data)
 		return -ENOMEM;
 
@@ -125,9 +125,7 @@ static void dummy_source_disable(struct coresight_device *csdev,
 	struct dummy_drvdata *drvdata =
 		 dev_get_drvdata(csdev->dev.parent);
 	coresight_csr_set_etr_atid(csdev, drvdata->traceid, false, NULL);
-	if (drvdata->static_atid && drvdata->traceid < CORESIGHT_TRACE_ID_RES_TOP)
-		coresight_trace_id_free_reserved_id(drvdata->traceid);
-	else
+	if (!drvdata->static_atid)
 		coresight_trace_id_put_system_id(drvdata->traceid);
 	dev_dbg(csdev->dev.parent, "Dummy source disabled\n");
 }
@@ -250,8 +248,6 @@ static int dummy_probe(struct platform_device *pdev)
 		}
 	}
 
-
-
 	dev_dbg(dev, "Dummy device initialized\n");
 
 	return 0;
@@ -263,7 +259,8 @@ static int dummy_remove(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 
 	pm_runtime_disable(dev);
-
+	if (drvdata->static_atid && drvdata->traceid < CORESIGHT_TRACE_ID_RES_TOP)
+		coresight_trace_id_free_reserved_id(drvdata->traceid);
 	coresight_unregister(drvdata->csdev);
 	return 0;
 }

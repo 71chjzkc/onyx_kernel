@@ -138,6 +138,14 @@ def _define_kernel_build(
         "certs/signing_key.x509",
     ])
 
+    if target.split("_")[0] in ["sun-le", "kera-le"]:
+        out_list += ["utsrelease.h"]
+        in_tree_module_list = in_tree_module_list + get_gki_modules_list("arm64")
+        in_tree_module_list = in_tree_module_list + get_kunit_modules_list("arm64")
+
+    if target.split("_")[0] == "qcs610":
+        out_list += ["utsrelease.h"]
+
     kernel_build(
         name = target,
         module_outs = in_tree_module_list,

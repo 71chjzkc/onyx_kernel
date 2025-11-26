@@ -126,7 +126,14 @@
 
 #define PTE_SH_IDX(pte) (pte & AV8L_FAST_PTE_SH_MASK)
 
-#define iopte_pmd_offset(pmds, base, iova) (pmds + ((iova - base) >> 12))
+#define iopte_pmd_offset(pmds, base, iova) \
+({ \
+	typeof(iova) __iova = (iova); \
+	typeof(base) __base = (base); \
+	typeof(pmds) __pmds = (pmds); \
+	(__iova < __base) ? ERR_PTR(-EINVAL) : \
+	__pmds + ((__iova - ALIGN_DOWN(__base, SZ_2M)) >> AV8L_FAST_PAGE_SHIFT); \
+})
 
 static inline dma_addr_t av8l_dma_addr(void *addr)
 {

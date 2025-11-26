@@ -28,7 +28,15 @@ load(
     "merged_kernel_uapi_headers",
 )
 load(":abi.bzl", "cc_binary_with_abi")
-load(":modules.bzl", "get_gki_modules_list", "get_kunit_modules_list")
+load(":consolidate.bzl", "define_consolidate")
+load(":consolidate_16k.bzl", "define_consolidate_16k")
+load(
+    ":modules.bzl",
+    "get_gki_modules_list",
+    "get_gki_protected_modules_list",
+    "get_kunit_modules_list",
+)
+load(":msm_platforms.bzl", "define_msm_platforms")
 
 package(
     default_visibility = [
@@ -581,11 +589,9 @@ copy_to_dist_dir(
     log = "info",
 )
 
-load(":consolidate.bzl", "define_consolidate")
-
 define_consolidate()
 
-load(":msm_platforms.bzl", "define_msm_platforms")
+define_consolidate_16k()
 
 define_msm_platforms()
 

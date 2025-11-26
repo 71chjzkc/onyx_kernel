@@ -1,6 +1,8 @@
 build.config.msm.sdxkova
 build.config.msm.sdxkova.cpe.wkk
 build.config.msm.sun
+build.config.msm.sun.le
+build.config.msm.kera.le
 build.config.msm.pineapple
 build.config.msm.sun.allyes
 build.config.msm.parrot
@@ -10,3 +12,4 @@ build.config.msm.monaco
 build.config.msm.miro
 build.config.msm.xuanyuan
 build.config.msm.onyx
+build.config.msm.qcs610

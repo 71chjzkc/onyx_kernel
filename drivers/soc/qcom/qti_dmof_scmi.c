@@ -20,6 +20,7 @@
 #include <linux/slab.h>
 #include <linux/wait.h>
 #include <uapi/linux/sched/types.h>
+#include <linux/cpu_phys_log_map.h>
 
 #define DMOF_ALGO_STR	(0x444D4F46) /* DMOF (Disable Memcpy Optimization Feature) ASCII */
 
@@ -82,7 +83,7 @@ static ssize_t disable_memcpy_optimization_store(struct device *dev,
 
 		per_cpu(need_ack, cpu) = true;
 		wake_up(&fds->waitq[cpu]);
-		wait_event(fds->waitq[cpu], !per_cpu(need_ack, cpu));
+		wait_event_killable(fds->waitq[cpu], !per_cpu(need_ack, cpu));
 		if (fds->ret < 0)
 			goto cleanup;
 		fds->curr_val[cpu] = fds->req_val;
@@ -100,7 +101,7 @@ cleanup:
 		fds->ret = 0;
 		per_cpu(need_ack, i) = true;
 		wake_up(&fds->waitq[i]);
-		wait_event(fds->waitq[i], !per_cpu(need_ack, i));
+		wait_event_killable(fds->waitq[i], !per_cpu(need_ack, i));
 		if (fds->ret < 0) {
 			dev_err(fds->dev, "dmof broken now:cpu:%d\n", i);
 			WARN_ON(1);
@@ -134,7 +135,7 @@ static ssize_t disable_memcpy_optimization_show(struct device *dev,
 
 		per_cpu(need_ack, cpu) = true;
 		wake_up(&fds->waitq[cpu]);
-		wait_event(fds->waitq[cpu], !per_cpu(need_ack, cpu));
+		wait_event_killable(fds->waitq[cpu], !per_cpu(need_ack, cpu));
 		if (fds->ret < 0)
 			goto cleanup;
 	}
@@ -179,13 +180,13 @@ static int qcom_dmof_kthread_fn(void *data)
 		}
 
 repeat:
-		wait_event(fds->waitq[cpu], per_cpu(need_ack, cpu));
+		wait_event_killable(fds->waitq[cpu], per_cpu(need_ack, cpu));
 		if (fds->ret < 0)
 			break;
 
 		BUG_ON(smp_processor_id() != cpu);
 
-		buf[0] = cpu;
+		buf[0] = cpu_logical_to_phys(cpu);
 		switch (fds->cmd) {
 		case COMMAND_INIT:
 			break;
@@ -279,7 +280,7 @@ static int cpu_up_notifier(unsigned int cpu)
 	per_cpu(need_ack, cpu) = true;
 	wake_up(&fds->waitq[cpu]);
 
-	wait_event(fds->waitq[cpu], !per_cpu(need_ack, cpu));
+	wait_event_killable(fds->waitq[cpu], !per_cpu(need_ack, cpu));
 	if (fds->ret >= 0)
 		fds->curr_val[cpu] = fds->val;
 

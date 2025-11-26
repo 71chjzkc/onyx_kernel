@@ -1329,7 +1329,8 @@ static int qcom_glink_rx_data(struct qcom_glink *glink, size_t avail, unsigned i
 		}
 	}
 
-	if (intent->size - intent->offset < chunk_size) {
+	if (intent->size < intent->offset ||
+	    intent->size - intent->offset < chunk_size) {
 		dev_err(glink->dev, "Insufficient space in intent\n");
 
 		/* The packet header lied, drop payload */
@@ -1968,6 +1969,11 @@ static int qcom_glink_request_intent(struct qcom_glink *glink,
 		dev_err(glink->dev, "%s: intent request ack timed out (%d)\n",
 			channel->name, channel->intent_timeout_count);
 		ret = -ETIMEDOUT;
+		channel->intent_timeout_count++;
+		if (channel->intent_timeout_count >= MAX_INTENT_TIMEOUTS)
+			GLINK_BUG(glink->ilc,
+				"remoteproc:%s channel:%s unresponsive\n",
+				glink->name, channel->name);
 	} else if (glink->abort_tx) {
 		ret = -ECANCELED;
 	} else {
