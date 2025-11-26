@@ -1019,6 +1019,13 @@ int __pkvm_register_el2_call(unsigned long hfn_hyp_va)
 EXPORT_SYMBOL(__pkvm_register_el2_call);
 #endif /* CONFIG_MODULES */
 
+int __pkvm_topup_hyp_alloc_mgt_mc(unsigned long id, struct kvm_hyp_memcache *mc)
+{
+	return kvm_call_hyp_nvhe(__pkvm_hyp_alloc_mgt_refill, id, mc->head,
+				 mc->nr_pages);
+}
+EXPORT_SYMBOL(__pkvm_topup_hyp_alloc_mgt_mc);
+
 int __pkvm_topup_hyp_alloc_mgt_gfp(unsigned long id, unsigned long nr_pages,
 				   unsigned long sz_alloc, gfp_t gfp)
 {
@@ -1031,8 +1038,7 @@ int __pkvm_topup_hyp_alloc_mgt_gfp(unsigned long id, unsigned long nr_pages,
 	if (ret)
 		return ret;
 
-	ret = kvm_call_hyp_nvhe(__pkvm_hyp_alloc_mgt_refill, id,
-				mc.head, mc.nr_pages);
+	ret = __pkvm_topup_hyp_alloc_mgt_mc(id, &mc);
 	if (ret)
 		free_hyp_memcache(&mc);
 

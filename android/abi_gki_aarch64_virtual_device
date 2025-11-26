@@ -396,6 +396,7 @@
   __serio_register_driver
   __serio_register_port
   serio_unregister_driver
+  set_page_private
   sg_alloc_table
   sg_free_table
   sg_init_one
@@ -478,6 +479,7 @@
   usb_create_shared_hcd
   usb_deregister
   usb_disabled
+  usb_find_common_endpoints
   usb_free_urb
   usb_get_dev
   usb_hcd_check_unlink_urb
@@ -1483,7 +1485,116 @@
   drm_writeback_queue_job
   drm_writeback_signal_completion
 
-# required by vmw_vsock_virtio_transport.ko
+# preserved by --additions-only
+  adjust_managed_page_count
+  all_vm_events
+  balloon_mops
+  balloon_page_alloc
+  balloon_page_dequeue
+  balloon_page_enqueue
+  blk_execute_rq
+  __blk_mq_alloc_disk
+  blk_mq_alloc_request
+  blk_mq_alloc_tag_set
+  blk_mq_complete_request
+  blk_mq_complete_request_remote
+  blk_mq_end_request
+  blk_mq_end_request_batch
+  blk_mq_free_request
+  blk_mq_free_tag_set
+  blk_mq_freeze_queue
+  blk_mq_map_queues
+  blk_mq_quiesce_queue
+  blk_mq_quiesce_queue_nowait
+  blk_mq_requeue_request
+  blk_mq_start_request
+  blk_mq_start_stopped_hw_queues
+  blk_mq_stop_hw_queue
+  blk_mq_unfreeze_queue
+  blk_mq_unquiesce_queue
+  blk_mq_virtio_map_queues
+  blk_queue_alignment_offset
+  blk_queue_chunk_sectors
+  blk_queue_flag_set
+  blk_queue_io_min
+  blk_queue_io_opt
+  blk_queue_logical_block_size
+  blk_queue_max_discard_sectors
+  blk_queue_max_discard_segments
+  blk_queue_max_hw_sectors
+  blk_queue_max_secure_erase_sectors
+  blk_queue_max_segments
+  blk_queue_max_segment_size
+  blk_queue_max_write_zeroes_sectors
+  blk_queue_max_zone_append_sectors
+  blk_queue_physical_block_size
+  blk_queue_write_cache
+  blk_revalidate_disk_zones
+  blk_rq_map_kern
+  __blk_rq_map_sg
+  blk_status_to_errno
+  cdev_add
+  cdev_alloc
+  cdev_del
+  __ClearPageMovable
+  cpufreq_cpu_get
+  cpufreq_cpu_put
+  cpu_scale
+  del_gendisk
+  device_add_disk
+  device_destroy
+  dev_pm_opp_free_cpufreq_table
+  dev_pm_opp_get_opp_count
+  dev_pm_opp_init_cpufreq_table
+  dev_pm_opp_of_add_table
+  disk_set_zoned
+  fasync_helper
+  get_device
+  hvc_alloc
+  hvc_instantiate
+  hvc_kick
+  hvc_poll
+  hvc_remove
+  __hvc_resize
+  init_on_free
+  __irq_apply_affinity_hint
+  kill_fasync
+  kobject_uevent
+  mutex_trylock
+  page_relinquish
+  page_reporting_register
+  page_reporting_unregister
+  page_shift_compat
+  page_shift_compat_enabled
+  pci_alloc_irq_vectors_affinity
+  pci_device_is_present
+  pci_disable_sriov
+  pci_enable_sriov
+  pci_find_capability
+  pci_find_ext_capability
+  pci_find_next_capability
+  pci_free_irq_vectors
+  pci_irq_get_affinity
+  pci_irq_vector
+  pci_read_config_dword
+  pci_read_config_word
+  pci_set_master
+  pci_vfs_assigned
+  pipe_lock
+  pipe_unlock
+  post_page_relinquish_tlb_inv
+  put_disk
+  __register_blkdev
+  __register_chrdev
+  register_oom_notifier
+  register_shrinker
+  set_capacity_and_notify
+  set_disk_ro
+  __SetPageMovable
+  sg_alloc_table_chained
+  sg_free_table_chained
+  si_mem_available
+  si_meminfo
   sk_error_report
   virtio_transport_connect
   virtio_transport_deliver_tap_pkt
