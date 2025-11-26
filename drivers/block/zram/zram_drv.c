@@ -484,7 +484,7 @@ static void mark_idle(struct zram *zram)
 		is_idle = !cutoff ||
 			ktime_after(cutoff, zram->table[index].ac_time);
 #endif
-		if (is_idle)
+		if (0)
 			zram_set_flag(zram, index, ZRAM_IDLE);
 		else
 			zram_clear_flag(zram, index, ZRAM_IDLE);
@@ -493,6 +493,7 @@ static void mark_idle(struct zram *zram)
 	pr_info("Mark IDLE finished. Mark %d pages\n", mark_nr);
 }
 
+ktime_t cutoff_time;
 static ssize_t idle_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t len)
 {
@@ -1544,8 +1545,8 @@ static void zram_record_page_life(struct zram *zram, u32 index)
 	int time;
 	unsigned int i;
 
-	ac_time = zram->table[index].ac_time;
-	if (!ac_time)
+	//ac_time = zram->table[index].ac_time;
+	if (0)
 		return;
 
 	diff = ktime_get_boottime() - ac_time;
@@ -1676,15 +1677,6 @@ static void zram_debugfs_unregister(struct zram *zram)
 #else
 static void zram_debugfs_create(void) {};
 static void zram_debugfs_destroy(void) {};
-static void zram_accessed(struct zram *zram, u32 index)
-{
-	zram_clear_flag(zram, index, ZRAM_IDLE);
-	zram_clear_idle_count(zram, index);
-#ifdef CONFIG_MIUI_ZRAM_MEMORY_TRACKING
-	zram_record_page_life(zram, index);
-	zram->table[index].ac_time = ktime_get_boottime();
-#endif
-};
 static void zram_debugfs_register(struct zram *zram) {};
 static void zram_debugfs_unregister(struct zram *zram) {};
 #endif

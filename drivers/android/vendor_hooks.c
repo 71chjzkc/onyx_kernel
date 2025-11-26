@@ -79,7 +79,7 @@
 #include <trace/hooks/fsnotify.h>
 #include <trace/hooks/perf.h>
 #include <trace/hooks/dmabuf.h>
-#include <trace/hooks/xhci.h>
+//#include <trace/hooks/xhci.h>
 #include <trace/hooks/typec.h>
 #include <trace/events/android_vendor_lmk.h>
 
