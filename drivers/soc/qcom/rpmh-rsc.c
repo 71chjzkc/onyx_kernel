@@ -1786,6 +1786,11 @@ static int rpmh_rsc_probe(struct platform_device *pdev)
 		if (ret)
 			return ret;
 
+	if (drv->ver.major >= 3)
+		drv->regs = rpmh_rsc_reg_offset_ver_3_0;
+	else
+		drv->regs = rpmh_rsc_reg_offset_ver_2_7;
+
 		scnprintf(drv[i].name, sizeof(drv[i].name), "%s-drv-%d", name, i);
 
 		drv[i].base = devm_platform_ioremap_resource(pdev, i);
