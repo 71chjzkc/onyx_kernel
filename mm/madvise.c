@@ -1691,6 +1691,7 @@ int do_madvise(struct mm_struct *mm, unsigned long start, size_t len_in, int beh
 			&madv_behavior, madvise_vma_behavior);
 	blk_finish_plug(&plug);
 
+out:
 	madvise_unlock(mm, &madv_behavior);
 
 	return error;

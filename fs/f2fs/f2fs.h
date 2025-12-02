@@ -29,6 +29,10 @@
 #include <linux/fscrypt.h>
 #include <linux/fsverity.h>
 
+#ifndef IS_DEVICE_ALIASING
+#define IS_DEVICE_ALIASING(inode) 0
+#endif
+
 struct pagevec;
 
 #ifdef CONFIG_F2FS_CHECK_FS

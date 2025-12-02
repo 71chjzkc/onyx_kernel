@@ -172,8 +172,9 @@ void dst_release(struct dst_entry *dst)
 				dst_cache_reset_now(&md_dst->u.tun_info.dst_cache);
 		}
 #endif
-		dst_count_dec(dst);
+		dst_release(dst);
 		call_rcu_hurry(&dst->rcu_head, dst_destroy_rcu);
+}
 }
 EXPORT_SYMBOL(dst_release);
 

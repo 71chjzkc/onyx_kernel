@@ -4286,6 +4286,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
 	void *creq;
 	size_t sensitive_size;
+	struct crypto_aead *tfm;
 
 	rc = smb2_get_enc_key(server, le64_to_cpu(tr_hdr->SessionId), enc, key);
 	if (rc) {

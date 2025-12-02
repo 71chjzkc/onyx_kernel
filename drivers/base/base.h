@@ -12,6 +12,10 @@
  */
 #include <linux/notifier.h>
 
+#ifndef FWLINK_FLAG_IGNORE
+#define FWLINK_FLAG_IGNORE 0
+#endif
+
 /**
  * struct subsys_private - structure to hold the private to the driver core portions of the bus_type/class structure.
  *

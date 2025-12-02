@@ -1770,7 +1770,7 @@ retry:
 		if (ret == -EAGAIN)
 			ret = 0;
 
-		goto dec_account;
+		goto err_unlock;
 	}
 	kvm_pinned_pages_insert(ppage, &kvm->arch.pkvm.pinned_pages);
 	write_unlock(&kvm->mmu_lock);

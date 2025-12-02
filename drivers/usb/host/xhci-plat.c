@@ -22,7 +22,7 @@
 #include <linux/reset.h>
 
 #include <trace/hooks/usb.h>
-#include <trace/hooks/xhci.h>
+//#include <trace/hooks/xhci.h>
 
 #include "xhci.h"
 #include "xhci-plat.h"
