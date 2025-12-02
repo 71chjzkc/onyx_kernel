@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2019, 2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #include <linux/err.h>
@@ -15,7 +15,7 @@
 #include <linux/pm.h>
 #include <linux/of_address.h>
 #include <linux/nvmem-consumer.h>
-#include <linux/panic_notifier.h>
+#include <linux/input/qpnp-power-on.h>
 
 struct qcom_reboot_reason {
 	struct device *dev;
@@ -72,6 +72,14 @@ static int qcom_reboot_reason_reboot(struct notifier_block *this,
 				sizeof(reason->pon_reason));
 			}
 			return NOTIFY_OK;
+			if (reboot->nvmem_cell)
+				nvmem_cell_write(reboot->nvmem_cell,
+						 &reason->pon_reason,
+						 sizeof(reason->pon_reason));
+			else
+				qpnp_pon_set_restart_reason(
+						(enum pon_restart_reason)reason->pon_reason);
+			break;
 		}
 	}
 	nvmem_cell_write(reboot->nvmem_cell,
@@ -111,10 +119,13 @@ static int qcom_reboot_reason_probe(struct platform_device *pdev)
 
 	reboot->dev = &pdev->dev;
 
-	reboot->nvmem_cell = nvmem_cell_get(reboot->dev, "restart_reason");
-
-	if (IS_ERR(reboot->nvmem_cell))
-		return PTR_ERR(reboot->nvmem_cell);
+	if (of_property_read_bool(pdev->dev.of_node, "qcom,no-nvmem-cell-support"))
+		reboot->nvmem_cell = NULL;
+	else {
+		reboot->nvmem_cell = nvmem_cell_get(reboot->dev, "restart_reason");
+		if (IS_ERR(reboot->nvmem_cell))
+			return PTR_ERR(reboot->nvmem_cell);
+	}
 
 	reboot->reboot_nb.notifier_call = qcom_reboot_reason_reboot;
 	reboot->reboot_nb.priority = 255;

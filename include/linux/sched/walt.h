@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #ifndef _LINUX_SCHED_WALT_H
@@ -163,6 +163,11 @@ struct walt_task_struct {
 	u32				period_contrib_run;
 	u64				yield_ts;
 	u64				yield_total_sleep_usec;
+	s64				lst_tgt_ns;
+	int				lst_state_counter;
+	bool				lst;
+	int				pipeline_activity_cnt;
+	atomic_t			event_windows;
 };
 
 #define wts_to_ts(wts) ({ \
@@ -306,7 +311,7 @@ static inline int walt_set_enforce_high_irq_cpus(struct cpumask *set)
 	return -EINVAL;
 }
 
-static inline void walt_unset_enforce_high_irq_cpus(struct cpumask *unset)
+static inline int walt_unset_enforce_high_irq_cpus(struct cpumask *unset)
 {
 	return -EINVAL;
 }

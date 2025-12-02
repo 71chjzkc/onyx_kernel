@@ -48,8 +48,12 @@
   __balance_callbacks
   balance_push_callback
   bcmp
+  __bio_add_page
+  bio_alloc_bioset
+  bio_chain
   bio_endio
   bio_end_io_acct_remapped
+  bio_init
   bio_start_io_acct
   bitmap_allocate_region
   __bitmap_andnot
@@ -62,6 +66,8 @@
   __bitmap_set
   bitmap_zalloc
   __blk_alloc_disk
+  blkdev_get_by_dev
+  blkdev_put
   blk_execute_rq_nowait
   blk_get_queue
   blk_mq_free_request
@@ -413,6 +419,7 @@
   devm_platform_ioremap_resource
   devm_power_supply_register
   devm_qcom_smem_state_get
+  devm_register_sys_off_handler
   devm_regmap_del_irq_chip
   devm_regmap_field_alloc
   devm_regmap_field_bulk_alloc
@@ -673,6 +680,9 @@
   __fdget
   fd_install
   fget
+  file_path
+  filp_close
+  filp_open_block
   _find_first_bit
   _find_next_bit
   _find_next_zero_bit
@@ -702,6 +712,7 @@
   freq_qos_add_request
   freq_qos_remove_request
   freq_qos_update_request
+  fs_bio_set
   fwnode_find_reference
   fwnode_get_name
   fwnode_get_next_child_node
@@ -1246,6 +1257,7 @@
   netlink_unregister_notifier
   net_ns_type_operations
   net_ratelimit
+  next_arg
   nla_find
   nla_memcpy
   __nla_parse
@@ -1500,6 +1512,7 @@
   __pm_runtime_use_autosuspend
   __pm_stay_awake
   pm_stay_awake
+  pm_suspend_target_state
   pm_system_wakeup
   pm_wakeup_dev_event
   pm_wakeup_ws_event
@@ -1796,6 +1809,7 @@
   set_capacity_and_notify
   set_next_entity
   __SetPageMovable
+  set_page_private
   set_task_cpu
   sg_alloc_table
   sg_alloc_table_from_pages_segment
@@ -1909,6 +1923,7 @@
   sock_release
   sock_setsockopt
   sock_unregister
+  sort
   __spi_alloc_controller
   spi_register_controller
   spi_unregister_controller
@@ -1952,6 +1967,8 @@
   strscpy_pad
   strsep
   strstr
+  submit_bio
+  submit_bio_wait
   __sw_hweight16
   __sw_hweight32
   __sw_hweight64
@@ -2131,6 +2148,8 @@
   __traceiter_android_vh_ufs_send_uic_command
   __traceiter_android_vh_ufs_update_sdev
   __traceiter_android_vh_update_topology_flags_workfn
+  __traceiter_android_vh_zs_shrinker_adjust
+  __traceiter_android_vh_zs_shrinker_bypass
   __traceiter_cpu_frequency_limits
   __traceiter_ipi_entry
   __traceiter_ipi_raise
@@ -2138,6 +2157,10 @@
   __traceiter_mmap_lock_acquire_returned
   __traceiter_mmap_lock_released
   __traceiter_mmap_lock_start_locking
+  __traceiter_rwmmio_post_read
+  __traceiter_rwmmio_post_write
+  __traceiter_rwmmio_read
+  __traceiter_rwmmio_write
   __traceiter_sched_overutilized_tp
   __traceiter_sched_switch
   __traceiter_sk_data_ready
@@ -2235,6 +2258,8 @@
   __tracepoint_android_vh_ufs_send_uic_command
   __tracepoint_android_vh_ufs_update_sdev
   __tracepoint_android_vh_update_topology_flags_workfn
+  __tracepoint_android_vh_zs_shrinker_adjust
+  __tracepoint_android_vh_zs_shrinker_bypass
   __tracepoint_cpu_frequency_limits
   __tracepoint_ipi_entry
   __tracepoint_ipi_raise
@@ -2245,6 +2270,10 @@
   tracepoint_probe_register
   tracepoint_probe_register_prio
   tracepoint_probe_unregister
+  __tracepoint_rwmmio_post_read
+  __tracepoint_rwmmio_post_write
+  __tracepoint_rwmmio_read
+  __tracepoint_rwmmio_write
   __tracepoint_sched_overutilized_tp
   __tracepoint_sched_switch
   __tracepoint_sk_data_ready

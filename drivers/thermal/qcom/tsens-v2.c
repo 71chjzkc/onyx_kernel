@@ -42,6 +42,9 @@ static struct tsens_features tsens_v2_feat = {
 	.max_sensors	= 16,
 	.trip_min_temp	= -40000,
 	.trip_max_temp	= 204000,
+	.valid_bit = BIT(21),
+	.last_temp_mask = 0xFFF,
+	.last_temp_resolution = 11,
 };
 
 static struct tsens_features ipq8074_feat = {

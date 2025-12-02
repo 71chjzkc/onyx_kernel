@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2023-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #include <linux/atomic.h>
@@ -1020,6 +1020,21 @@ static void gpi_dump_debug_reg(struct gpii *gpii)
 	GPII_ERR(gpii, GPI_DBG_COMMON, "Global IRQ handling Exit\n");
 }
 
+/**
+ * get_gpii_chan_req_tres() - Retrieve the TRE size (`req_tres`) for
+ *                            the specified GPII channel from the DTSI
+ * @chan: Base address of the DMA channel
+ *
+ * Return: The TRE size of the GPII channel.
+ */
+u32 get_gpii_chan_req_tres(struct dma_chan *chan)
+{
+	struct gpii_chan *gpii_chan = to_gpii_chan(chan);
+
+	return gpii_chan->req_tres;
+}
+EXPORT_SYMBOL_GPL(get_gpii_chan_req_tres);
+
 void gpi_dump_for_geni(struct dma_chan *chan)
 {
 	struct gpii_chan *gpii_chan = to_gpii_chan(chan);
@@ -1671,8 +1686,8 @@ static int gpi_send_cmd(struct gpii *gpii,
 			enum gpi_cmd gpi_cmd)
 {
 	u32 chid = MAX_CHANNELS_PER_GPII;
-	u32 cmd;
-	u32 offset, irq_stat;
+	u32 cmd, state = MAX_CH_STATES;
+	u32 irq_stat, offset, ch_irq;
 	unsigned long timeout;
 	void __iomem *cmd_reg;
 
@@ -1700,10 +1715,27 @@ static int gpi_send_cmd(struct gpii *gpii,
 	if (!timeout) {
 		offset = GPI_GPII_n_CNTXT_TYPE_IRQ_OFFS(gpii->gpii_id);
 		irq_stat = gpi_read_reg(gpii, gpii->regs + offset);
-		GPII_ERR(gpii, chid,
-			 "cmd: %s completion timeout irq_status=0x%x\n",
-		TO_GPI_CMD_STR(gpi_cmd), irq_stat);
-		return -EIO;
+		if (gpii_chan)
+			state = gpi_read_ch_state(gpii_chan);
+		/* Fallback mechanism for verifying the state of the register */
+		if (irq_stat & GPI_GPII_n_CNTXT_TYPE_IRQ_MSK_CH_CTRL) {
+			offset = GPI_GPII_n_CNTXT_SRC_GPII_CH_IRQ_OFFS(gpii->gpii_id);
+			ch_irq = gpi_read_reg(gpii, gpii->regs + offset);
+			if (cmd != state) {
+				GPII_ERR(gpii, chid,
+					 "cmd: %s completion timeout ch_state=0x%x and irq_status=0x%x\n",
+					  TO_GPI_CMD_STR(gpi_cmd), state, irq_stat);
+				return -EIO;
+			}
+			/* Clear the channel interrupt status by writing the interrupt value */
+			offset = GPI_GPII_n_CNTXT_SRC_CH_IRQ_CLR_OFFS(gpii->gpii_id);
+			gpi_write_reg(gpii, gpii->regs + offset, (u32)ch_irq);
+		} else {
+			GPII_ERR(gpii, chid,
+				 "cmd: %s completion timeout ch_state=0x%x and irq_status=0x%x\n",
+				 TO_GPI_CMD_STR(gpi_cmd), state, irq_stat);
+			return -EIO;
+		}
 	}
 
 	/* confirm new ch state is correct , if the cmd is a state change cmd */

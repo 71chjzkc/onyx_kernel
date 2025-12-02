@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (c) 2013-2022, Linux Foundation. All rights reserved.
- * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2013-2021, Linux Foundation. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #include <linux/acpi.h>
@@ -589,8 +589,19 @@ static int ufs_qcom_get_connected_rx_lanes(struct ufs_hba *hba, u32 *rx_lanes)
 
 static inline void ufs_qcom_ice_enable(struct ufs_qcom_host *host)
 {
-	if (host->hba->caps & UFSHCD_CAP_CRYPTO)
-		qcom_ice_enable(host->ice);
+	int err;
+
+	if (host->hba->caps & UFSHCD_CAP_CRYPTO) {
+		err = qcom_ice_enable(host->ice);
+
+		if (err) {
+			dev_warn(
+				host->hba->dev,
+				"ICE could not be enabled err=%d. Disabling inline encryption support.\n",
+				err);
+			host->hba->caps &= ~UFSHCD_CAP_CRYPTO;
+		}
+	}
 }
 
 static int ufs_qcom_ice_init(struct ufs_qcom_host *host)
@@ -616,9 +627,20 @@ static int ufs_qcom_ice_init(struct ufs_qcom_host *host)
 
 static inline int ufs_qcom_ice_resume(struct ufs_qcom_host *host)
 {
-	if (host->hba->caps & UFSHCD_CAP_CRYPTO)
-		return qcom_ice_resume(host->ice);
+	int err;
 
+	if (host->hba->caps & UFSHCD_CAP_CRYPTO) {
+		err = qcom_ice_resume(host->ice);
+
+		if (err) {
+			dev_warn(
+				host->hba->dev,
+				"ICE could not be resumed err=%d. Disabling inline encryption support.\n",
+				err);
+			host->hba->caps &= ~UFSHCD_CAP_CRYPTO;
+		}
+		return err;
+	}
 	return 0;
 }
 
@@ -2444,17 +2466,13 @@ ufshcd_is_valid_pm_lvl(enum ufs_pm_level lvl)
 	return lvl >= 0 && lvl < UFS_PM_LVL_MAX;
 }
 
-static void ufshcd_parse_pm_levels(struct ufs_hba *hba)
+static void ufs_qcom_parse_pm_levels(struct ufs_hba *hba)
 {
 	struct device *dev = hba->dev;
 	struct device_node *np = dev->of_node;
-	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
 	enum ufs_pm_level rpm_lvl = UFS_PM_LVL_MAX, spm_lvl = UFS_PM_LVL_MAX;
 
 	if (!np)
-		return;
-
-	if (host->is_dt_pm_level_read)
 		return;
 
 	if (!of_property_read_u32(np, "rpm-level", &rpm_lvl) &&
@@ -2463,7 +2481,7 @@ static void ufshcd_parse_pm_levels(struct ufs_hba *hba)
 	if (!of_property_read_u32(np, "spm-level", &spm_lvl) &&
 		ufshcd_is_valid_pm_lvl(spm_lvl))
 		hba->spm_lvl = spm_lvl;
-	host->is_dt_pm_level_read = true;
+
 }
 
 static void ufs_qcom_override_pa_tx_hsg1_sync_len(struct ufs_hba *hba)
@@ -2503,8 +2521,6 @@ static int ufs_qcom_apply_dev_quirks(struct ufs_hba *hba)
 
 	if (hba->dev_quirks & UFS_DEVICE_QUIRK_PA_TX_HSG1_SYNC_LENGTH)
 		ufs_qcom_override_pa_tx_hsg1_sync_len(hba);
-
-	ufshcd_parse_pm_levels(hba);
 
 	if (hba->dev_info.wmanufacturerid == UFS_VENDOR_MICRON)
 		hba->dev_quirks |= UFS_DEVICE_QUIRK_DELAY_BEFORE_LPM;
@@ -3423,21 +3439,6 @@ static void ufs_qcom_storage_boost_param_init(struct ufs_hba *hba)
 	host->max_boost_thres = NUM_REQS_HIGH_THRESH;
 }
 
-static void ufs_qcom_parse_pm_level(struct ufs_hba *hba)
-{
-	struct device *dev = hba->dev;
-	struct device_node *np = dev->of_node;
-
-	if (np) {
-		if (of_property_read_u32(np, "rpm-level",
-					 &hba->rpm_lvl))
-			hba->rpm_lvl = -1;
-		if (of_property_read_u32(np, "spm-level",
-					 &hba->spm_lvl))
-			hba->spm_lvl = -1;
-	}
-}
-
 /* Returns the max mitigation level supported */
 static int ufs_qcom_get_max_therm_state(struct thermal_cooling_device *tcd,
 				  unsigned long *data)
@@ -4123,7 +4124,7 @@ static int ufs_qcom_init(struct ufs_hba *hba)
 	if (err)
 		goto out_disable_parent_vreg;
 
-	ufs_qcom_parse_pm_level(hba);
+	ufs_qcom_parse_pm_levels(hba);
 	ufs_qcom_parse_g4_workaround_flag(host);
 	ufs_qcom_parse_lpm(host);
 	if (host->disable_lpm)
@@ -6301,8 +6302,31 @@ static int ufs_qcom_probe(struct platform_device *pdev)
  */
 static int ufs_qcom_remove(struct platform_device *pdev)
 {
-	struct ufs_hba *hba =  platform_get_drvdata(pdev);
-	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
+	struct ufs_hba *hba;
+	struct ufs_qcom_host *host;
+	struct ufs_qcom_qos_req *r;
+	struct qos_cpu_group *qcg;
+	int i;
+
+	if (!is_bootdevice_ufs) {
+		dev_info(&pdev->dev, "UFS is not boot dev.\n");
+		return 0;
+	}
+
+	hba =  platform_get_drvdata(pdev);
+	host = ufshcd_get_variant(hba);
+
+	if (host->ufs_qos) {
+		r = host->ufs_qos;
+		qcg = r->qcg;
+
+		pm_runtime_get_sync(&(pdev)->dev);
+		for (i = 0; i < r->num_groups; i++, qcg++)
+			remove_group_qos(qcg);
+	}
+	if (msm_minidump_enabled())
+		atomic_notifier_chain_unregister(&panic_notifier_list,
+				&host->ufs_qcom_panic_nb);
 
 	ufshcd_remove(hba);
 	if (host->esi_enabled)

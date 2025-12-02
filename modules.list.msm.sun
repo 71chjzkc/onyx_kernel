@@ -122,3 +122,5 @@ hwid.ko
 mi_power.ko
 zram.ko
 zsmalloc.ko
+nvmem_qfprom.ko
+qfprom-sys.ko

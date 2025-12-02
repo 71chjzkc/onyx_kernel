@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /* Copyright (c) 2013-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #ifndef UFS_QCOM_H_
@@ -244,12 +244,6 @@ enum ufs_qcom_phy_init_type {
 #define DME_VS_CORE_CLK_CTRL_DME_HW_CGC_EN			BIT(9)
 
 /* Device Quirks */
-/*
- * Some ufs devices may need more time to be in hibern8 before exiting.
- * Enable this quirk to give it an additional 100us.
- */
-#define UFS_DEVICE_QUIRK_PA_HIBER8TIME          (1 << 15)
-
 /*
  * Some ufs device vendors need a different TSync length.
  * Enable this quirk to give an additional TX_HS_SYNC_LENGTH.
@@ -576,7 +570,6 @@ struct ufs_qcom_host {
 	struct ufs_vreg *vccq_proxy_client;
 	bool work_pending;
 	bool bypass_g4_cfgready;
-	bool is_dt_pm_level_read;
 	bool is_phy_pwr_on;
 	/* Protect the usage of is_phy_pwr_on against racing */
 	struct mutex phy_mutex;

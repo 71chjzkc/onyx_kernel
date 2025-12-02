@@ -1,6 +1,7 @@
-load(":target_variants.bzl", "la_variants")
-load(":msm_kernel_la.bzl", "define_msm_la")
 load(":image_opts.bzl", "boot_image_opts")
+load(":msm_kernel_16k_la.bzl", "define_msm_16k_la")
+load(":msm_kernel_la.bzl", "define_msm_la")
+load(":target_variants.bzl", "la_variants")
 
 target_name = "sun"
 target_arch = "sun"
@@ -289,6 +290,7 @@ target_arch_in_tree_modules = [
         "drivers/soc/qcom/smp2p.ko",
         "drivers/soc/qcom/smp2p_sleepstate.ko",
         "drivers/soc/qcom/socinfo.ko",
+        "drivers/soc/qcom/spmi-pmic-err-debug.ko",
         "drivers/soc/qcom/sps/sps_drv.ko",
         "drivers/soc/qcom/sys_pm_vx.ko",
         "drivers/soc/qcom/sysmon_subsystem_stats.ko",

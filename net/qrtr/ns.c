@@ -3,7 +3,7 @@
  * Copyright (c) 2015, Sony Mobile Communications Inc.
  * Copyright (c) 2013, The Linux Foundation. All rights reserved.
  * Copyright (c) 2020, Linaro Ltd.
- * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022,2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #define pr_fmt(fmt) "qrtr: %s(): " fmt, __func__
@@ -122,6 +122,7 @@ int qrtr_get_service_id(unsigned int node_id, unsigned int port_id)
 			return svc_id;
 		}
 	}
+	xa_unlock(&node->servers);
 
 	xa_unlock(&node->servers);
 

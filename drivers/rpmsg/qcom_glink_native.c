@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (c) 2016-2017, Linaro Ltd
- * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #include <linux/idr.h>
@@ -1329,7 +1329,8 @@ static int qcom_glink_rx_data(struct qcom_glink *glink, size_t avail, unsigned i
 		}
 	}
 
-	if (intent->size - intent->offset < chunk_size) {
+	if (intent->size < intent->offset ||
+	    intent->size - intent->offset < chunk_size) {
 		dev_err(glink->dev, "Insufficient space in intent\n");
 
 		/* The packet header lied, drop payload */
@@ -1968,6 +1969,11 @@ static int qcom_glink_request_intent(struct qcom_glink *glink,
 		dev_err(glink->dev, "%s: intent request ack timed out (%d)\n",
 			channel->name, channel->intent_timeout_count);
 		ret = -ETIMEDOUT;
+		channel->intent_timeout_count++;
+		if (channel->intent_timeout_count >= MAX_INTENT_TIMEOUTS)
+			GLINK_BUG(glink->ilc,
+				"remoteproc:%s channel:%s unresponsive\n",
+				glink->name, channel->name);
 	} else if (glink->abort_tx) {
 		ret = -ECANCELED;
 	} else {
@@ -2576,8 +2582,6 @@ void qcom_glink_native_remove(struct qcom_glink *glink)
 	int cid;
 	int ret;
 
-	qcom_glink_cancel_rx_work(glink);
-
 	/* Fail all attempts at sending messages */
 	spin_lock_irqsave(&glink->tx_lock, flags);
 	glink->abort_tx = true;
@@ -2589,6 +2593,8 @@ void qcom_glink_native_remove(struct qcom_glink *glink)
 	idr_for_each_entry(&glink->lcids, channel, cid)
 		qcom_glink_intent_req_abort(channel);
 	spin_unlock_irqrestore(&glink->idr_lock, flags);
+
+	qcom_glink_cancel_rx_work(glink);
 
 	ret = device_for_each_child(glink->dev, NULL, qcom_glink_remove_device);
 	if (ret)
