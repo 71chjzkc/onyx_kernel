@@ -12,6 +12,7 @@
   __arch_copy_to_user
   arm64_use_ng_mappings
   bcmp
+  bpf_redirect_info
   bpf_trace_run1
   bpf_trace_run2
   bpf_trace_run3
@@ -230,6 +231,7 @@
   kmemdup
   kstrndup
   kstrtobool_from_user
+  kstrtoint
   kthread_create_on_node
   kthread_park
   kthread_should_stop
@@ -307,6 +309,7 @@
   page_pool_alloc_frag
   page_pool_destroy
   page_pool_put_defragged_page
+  param_array_ops
   param_ops_bool
   param_ops_charp
   param_ops_int
@@ -425,11 +428,22 @@
   skb_queue_tail
   skb_to_sgvec
   skb_trim
+  snd_card_register
+  snd_ctl_add
+  snd_ctl_new1
+  snd_ctl_notify
+  snd_pcm_format_physical_width
+  snd_pcm_hw_constraint_integer
+  snd_pcm_new
+  snd_pcm_period_elapsed
+  snd_pcm_set_managed_buffer_all
+  snd_pcm_set_ops
   snprintf
   sprintf
   sscanf
   __stack_chk_fail
   strcasecmp
+  strchr
   strcmp
   strcpy
   strlen
@@ -497,6 +511,16 @@
   usb_unanchor_urb
   __usecs_to_jiffies
   usleep_range_state
+  utf8_data_table
+  v4l2_device_register
+  v4l2_device_unregister
+  v4l2_event_pending
+  v4l2_event_subscribe
+  v4l2_event_unsubscribe
+  v4l2_fh_add
+  v4l2_fh_del
+  v4l2_fh_exit
+  v4l2_fh_init
   vfree
   virtio_break_device
   virtio_check_driver_offered_feature
@@ -730,6 +754,13 @@
 # required by goldfish_address_space.ko
   memremap
   memunmap
+  pci_disable_device
+  pci_enable_device
+  pci_read_config_byte
+  __pci_register_driver
+  pci_release_region
+  pci_request_region
+  pci_unregister_driver
 
 # required by goldfish_battery.ko
   power_supply_changed
@@ -776,6 +807,7 @@
   unregister_candev
   usb_control_msg_recv
   usb_control_msg_send
+  usb_find_common_endpoints
 
 # required by hci_vhci.ko
   _copy_from_iter
@@ -1045,6 +1077,7 @@
   dma_sync_sg_for_cpu
   __sg_page_iter_next
   __sg_page_iter_start
+  _totalram_pages
   vmap
   vunmap
 
@@ -1057,7 +1090,6 @@
 # required by v4l2loopback.ko
   kstrtoull
   mutex_lock_killable
-  param_array_ops
   v4l2_ctrl_handler_free
   v4l2_ctrl_handler_init_class
   v4l2_ctrl_handler_setup
@@ -1100,11 +1132,12 @@
 # required by vhci-hcd.ko
   kernel_sendmsg
   kernel_sock_shutdown
-  kstrtoint
   kstrtoll
   platform_bus
   sockfd_lookup
   strchr
+  sysfs_create_group
+  sysfs_remove_group
   usb_speed_string
 
 # required by virt_wifi.ko
@@ -1137,7 +1170,7 @@
   drm_atomic_helper_damage_merged
   drm_atomic_helper_dirtyfb
   drm_atomic_helper_plane_destroy_state
-  drm_atomic_helper_plane_duplicate_state
+  __drm_atomic_helper_plane_duplicate_state
   drm_atomic_helper_plane_reset
   drm_connector_attach_edid_property
   drm_connector_register
@@ -1326,6 +1359,28 @@
   device_for_each_child
   device_register
   memparse
+  register_virtio_device
+  synchronize_irq
+  __traceiter_rwmmio_post_read
+  __traceiter_rwmmio_post_write
+  __traceiter_rwmmio_read
+  __traceiter_rwmmio_write
+  __tracepoint_rwmmio_post_read
+  __tracepoint_rwmmio_post_write
+  __tracepoint_rwmmio_read
+  __tracepoint_rwmmio_write
+  unregister_virtio_device
+  virtio_config_changed
+  virtio_device_freeze
+  virtio_device_restore
+  virtqueue_get_avail_addr
+  virtqueue_get_desc_addr
+  virtqueue_get_used_addr
+  vring_create_virtqueue
+  vring_del_virtqueue
+  vring_interrupt
+  vring_notification_data
+  vring_transport_features
 
 # required by virtio_net.ko
   bpf_dispatcher_xdp_func
@@ -1424,20 +1479,10 @@
 # required by virtio_snd.ko
   snd_card_free
   snd_card_new
-  snd_card_register
-  snd_ctl_add
-  snd_ctl_new1
-  snd_ctl_notify
   snd_jack_new
   snd_jack_report
   snd_pcm_add_chmap_ctls
-  snd_pcm_format_physical_width
-  snd_pcm_hw_constraint_integer
   snd_pcm_lib_ioctl
-  snd_pcm_new
-  snd_pcm_period_elapsed
-  snd_pcm_set_managed_buffer_all
-  snd_pcm_set_ops
   wait_for_completion_interruptible_timeout
 
 # required by vkms.ko
@@ -1483,7 +1528,122 @@
   drm_writeback_queue_job
   drm_writeback_signal_completion
 
-# required by vmw_vsock_virtio_transport.ko
+# preserved by --additions-only
+  adjust_managed_page_count
+  all_vm_events
+  balloon_mops
+  balloon_page_alloc
+  balloon_page_dequeue
+  balloon_page_enqueue
+  blk_execute_rq
+  __blk_mq_alloc_disk
+  blk_mq_alloc_request
+  blk_mq_alloc_tag_set
+  blk_mq_complete_request
+  blk_mq_complete_request_remote
+  blk_mq_end_request
+  blk_mq_end_request_batch
+  blk_mq_free_request
+  blk_mq_free_tag_set
+  blk_mq_freeze_queue
+  blk_mq_map_queues
+  blk_mq_quiesce_queue
+  blk_mq_quiesce_queue_nowait
+  blk_mq_requeue_request
+  blk_mq_start_request
+  blk_mq_start_stopped_hw_queues
+  blk_mq_stop_hw_queue
+  blk_mq_unfreeze_queue
+  blk_mq_unquiesce_queue
+  blk_mq_virtio_map_queues
+  blk_queue_alignment_offset
+  blk_queue_chunk_sectors
+  blk_queue_flag_set
+  blk_queue_io_min
+  blk_queue_io_opt
+  blk_queue_logical_block_size
+  blk_queue_max_discard_sectors
+  blk_queue_max_discard_segments
+  blk_queue_max_hw_sectors
+  blk_queue_max_secure_erase_sectors
+  blk_queue_max_segments
+  blk_queue_max_segment_size
+  blk_queue_max_write_zeroes_sectors
+  blk_queue_max_zone_append_sectors
+  blk_queue_physical_block_size
+  blk_queue_write_cache
+  blk_revalidate_disk_zones
+  blk_rq_map_kern
+  __blk_rq_map_sg
+  blk_status_to_errno
+  cdev_add
+  cdev_alloc
+  cdev_del
+  __ClearPageMovable
+  cpufreq_cpu_get
+  cpufreq_cpu_put
+  cpu_scale
+  del_gendisk
+  device_add_disk
+  device_destroy
+  dev_pm_opp_free_cpufreq_table
+  dev_pm_opp_get_opp_count
+  dev_pm_opp_init_cpufreq_table
+  dev_pm_opp_of_add_table
+  disk_set_zoned
+  fasync_helper
+  get_device
+  hvc_alloc
+  hvc_instantiate
+  hvc_kick
+  hvc_poll
+  hvc_remove
+  __hvc_resize
+  init_on_free
+  __irq_apply_affinity_hint
+  kill_fasync
+  kobject_uevent
+  mutex_trylock
+  page_relinquish
+  page_reporting_register
+  page_reporting_unregister
+  page_shift_compat
+  page_shift_compat_enabled
+  pci_alloc_irq_vectors_affinity
+  pci_device_is_present
+  pci_disable_sriov
+  pci_enable_sriov
+  pci_find_capability
+  pci_find_ext_capability
+  pci_find_next_capability
+  pci_free_irq_vectors
+  pci_iomap
+  pci_iomap_range
+  pci_iounmap
+  pci_irq_get_affinity
+  pci_irq_vector
+  pci_read_config_dword
+  pci_read_config_word
+  pci_release_selected_regions
+  pci_request_selected_regions
+  pci_set_master
+  pci_vfs_assigned
+  pipe_lock
+  pipe_unlock
+  post_page_relinquish_tlb_inv
+  put_disk
+  __register_blkdev
+  __register_chrdev
+  register_oom_notifier
+  register_shrinker
+  set_capacity_and_notify
+  set_disk_ro
+  __SetPageMovable
+  set_page_private
+  sg_alloc_table_chained
+  sg_free_table_chained
+  si_mem_available
+  si_meminfo
   sk_error_report
   virtio_transport_connect
   virtio_transport_deliver_tap_pkt
