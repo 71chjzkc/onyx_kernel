@@ -179,3 +179,5 @@ sphinx_*/
 
 # Xiaomi Add
 drivers/misc/hwid/
+
+*.zip
