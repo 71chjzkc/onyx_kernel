@@ -772,19 +772,6 @@ int f2fs_do_truncate_blocks(struct inode *inode, u64 from, bool lock)
 		goto out;
 	}
 
-	if (IS_DEVICE_ALIASING(inode)) {
-		struct extent_tree *et = F2FS_I(inode)->extent_tree[EX_READ];
-		struct extent_info ei = et->largest;
-
-		f2fs_invalidate_blocks(sbi, ei.blk, ei.len);
-
-		dec_valid_block_count(sbi, inode, ei.len);
-		f2fs_update_time(sbi, REQ_TIME);
-
-		f2fs_put_page(ipage, 1);
-		goto out;
-	}
-
 	if (f2fs_has_inline_data(inode)) {
 		f2fs_truncate_inline_inode(inode, ipage, from);
 		f2fs_put_page(ipage, 1);
@@ -3518,12 +3505,6 @@ static int f2fs_ioc_get_pin_file(struct file *filp, unsigned long arg)
 	return put_user(pin, (u32 __user *)arg);
 }
 
-static int f2fs_ioc_get_dev_alias_file(struct file *filp, unsigned long arg)
-{
-	return put_user(IS_DEVICE_ALIASING(file_inode(filp)) ? 1 : 0,
-			(u32 __user *)arg);
-}
-
 static int f2fs_ioc_io_prio(struct file *filp, unsigned long arg)
 {
 	struct inode *inode = file_inode(filp);
@@ -4640,8 +4621,6 @@ static long __f2fs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return f2fs_ioc_decompress_file(filp);
 	case F2FS_IOC_COMPRESS_FILE:
 		return f2fs_ioc_compress_file(filp);
-	case F2FS_IOC_GET_DEV_ALIAS_FILE:
-		return f2fs_ioc_get_dev_alias_file(filp, arg);
 	case F2FS_IOC_IO_PRIO:
 		return f2fs_ioc_io_prio(filp, arg);
 	default:
@@ -5364,7 +5343,6 @@ long f2fs_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	case F2FS_IOC_SET_COMPRESS_OPTION:
 	case F2FS_IOC_DECOMPRESS_FILE:
 	case F2FS_IOC_COMPRESS_FILE:
-	case F2FS_IOC_GET_DEV_ALIAS_FILE:
 	case F2FS_IOC_IO_PRIO:
 		break;
 	default:
