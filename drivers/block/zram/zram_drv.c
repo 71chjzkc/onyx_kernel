@@ -1496,37 +1496,6 @@ static struct zram_pages_life *init_pages_life(void)
 	}
 	return pl;
 }
-
-static void zram_record_page_life(struct zram *zram, u32 index)
-{
-	struct zram_pages_life *pl = NULL;
-	ktime_t ac_time, diff;
-	int time;
-	unsigned int i;
-
-	ac_time = zram->table[index].ac_time;
-	if (!ac_time)
-		return;
-
-	diff = ktime_get_boottime() - ac_time;
-	time = ktime_to_ms(diff) / 1000;
-
-	rcu_read_lock();
-	pl =  rcu_dereference(zram->pages_life);
-	if (pl) {
-		for (i = 0; i < pl->time_nr; i++) {
-			if (time <= pl->time_list[i]) {
-				pl->lifes[i]++;
-				rcu_read_unlock();
-				return;
-			}
-		}
-		pl->lifes[i]++;
-	}
-	rcu_read_unlock();
-
-	return;
-}
 #endif
 
 #ifdef CONFIG_ZRAM_MEMORY_TRACKING
