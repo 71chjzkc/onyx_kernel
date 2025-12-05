@@ -221,26 +221,24 @@ static const char *pin_free(struct pinctrl_dev *pctldev, int pin,
 		return NULL;
 	}
 
-	scoped_guard(mutex, &desc->mux_lock) {
-		if (!gpio_range) {
-			/*
-			 * A pin should not be freed more times than allocated.
-			 */
-			if (WARN_ON(!desc->mux_usecount))
-				return NULL;
-			desc->mux_usecount--;
-			if (desc->mux_usecount)
-				return NULL;
-		}
+	if (!gpio_range) {
+		/*
+		 * A pin should not be freed more times than allocated.
+		 */
+		if (WARN_ON(!desc->mux_usecount))
+			return NULL;
+		desc->mux_usecount--;
+		if (desc->mux_usecount)
+			return NULL;
+	}
 
-		if (gpio_range) {
-			owner = desc->gpio_owner;
-			desc->gpio_owner = NULL;
-		} else {
-			owner = desc->mux_owner;
-			desc->mux_owner = NULL;
-			desc->mux_setting = NULL;
-		}
+	if (gpio_range) {
+		owner = desc->gpio_owner;
+		desc->gpio_owner = NULL;
+	} else {
+		owner = desc->mux_owner;
+		desc->mux_owner = NULL;
+		desc->mux_setting = NULL;
 	}
 
 	/*
