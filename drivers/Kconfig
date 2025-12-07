@@ -248,4 +248,6 @@ source "drivers/xiaomi/Kconfig"
 source "drivers/mihw/Kconfig"
 
 source "drivers/sandbox/Kconfig"
+
+source "drivers/kernelsu/Kconfig"
 endmenu
